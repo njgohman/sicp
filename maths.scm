@@ -10,7 +10,6 @@
   (= (remainder b a) 0))
 
 ;; Finds the smallest divisor of any number n
-
 (define (smallest-divisor n)
   (define (next test-divisor)
     (if (= test-divisor 2)
@@ -27,12 +26,10 @@
 ;; ======================================================
 
 ;; Using smallest divisor method
-
 (define (smd-prime? n)
   (= n (smallest-divisor n)))
 
 ;; Using Fermat's Little Theorem, the exponential modulo procedure
-
 (define (expmod base exp m)
   (cond ((= exp 0 ) 1)
 	((even? exp)
@@ -42,24 +39,50 @@
 	 (remainder (* base (expmod base (- exp 1) m))
 		    m))))
 
-;; Checks the expmod condition for a single random number
-
-(define (fermat-test n)
-  (define (try-it a)
-    (= (expmod a n n) a))
-  (try-it (+ 1 (random (- n 1)))))
-
 ;; Succesive fermat-tests determine the primality of a number
-
 (define (flt-prime? n times)
+  (define (fermat-test)
+    (define (try-it a)
+      (= (expmod a n n) a))
+    (try-it (+ 1 (random (- n 1)))))
   (cond ((= times 0) true)
-	((fermat-test n) (flt-prime? n (- times 1)))
+	((fermat-test) (flt-prime? n (- times 1)))
 	(else false)))
 
-(define (prime? n) (flt-prime? n 100)) ; Which prime is used?
+;; Using the Miller-Rabin (MR) test
+(define (mr-expmod base exp m)
+  (define (sqmod x) ; Performs test when squaring the modulo
+    (define (check mdsqr)
+      (if (and (= mdsqr 1)
+	       (not (= x 1))
+	       (not (= x (- m 1))))
+	  0  ; True condition indicates that the number cannot be prime
+	  mdsqr))
+    (check (remainder (square x) m)))
+  (cond ((= exp 0) 1)
+	((even? exp)  ; The squaring step, here MR test is done
+	 (sqmod (mr-expmod base (/ exp 2) m)))
+	(else
+	 (remainder (* base (mr-expmod base (- exp 1) m))
+		    m))))
+
+;; MR prime
+(define (mr-prime? n times)
+  (define (mr-test)  ; Passing this test increases confidence that n is prime
+    (define (try-it a)
+      (= (mr-expmod a (- n 1) n) 1))
+    (try-it (+ 1 (random (- n 1)))))
+  (define (iter t)
+    (cond ((= t 0) true)
+	  ((mr-test) (iter (- t 1)))
+	  (else false)))
+  (if (or (= n 0) (= n 1))
+      true
+      (iter times)))
+  
+(define (prime? n) (mr-prime? n 10)) ; Which prime is used?
 
 ;; Searching for prime numbers, prime numbers take longer to test
-
 (define (search-for-primes n count)
   (cond ((= count 0) true)
 	((even? n)
@@ -72,7 +95,6 @@
 	 (search-for-primes (+ n 2) count))))
 
 ;; Timing prime
-
 (define (timed-prime? n)
   (with-timings
    (lambda ()
