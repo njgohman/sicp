@@ -4,10 +4,39 @@
 
 (define (square x) (* x x))
 
-(define (even? x) (= (remainder x 2) 0))
+;; Takes the average of two numbers
+(define (average a b) (/ ( + a b) 2.0))
+
+;; Takes b to the n
+(define (expt b n)
+  (define (iter a b n)
+    (cond ((= n 0) a)
+	  ((even? n) (iter a (square b) (/ n 2)))
+	  (else (iter (* a b) b (- n 1)))))
+  (iter 1 b n))
+
+;; Square root
+(define (sqrt x)
+  (define (good-enough? guess)
+    (< (abs (- (square guess) x)) 0.001))
+  (define (next guess x)
+    (average guess (/ x guess)))
+  (define (iter guess x)
+    (if (good-enough? guess)
+	guess
+	(iter (next guess x) x)))
+  (iter 1.0 x))
 
 (define (divides? a b)
   (= (remainder b a) 0))
+
+(define (even? x) (divides? 2 x))
+
+;; Finds the greatest commod divisor of any two numbers
+(define (gcd a b)
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
 
 ;; Finds the smallest divisor of any number n
 (define (smallest-divisor n)
