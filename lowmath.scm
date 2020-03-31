@@ -1,12 +1,37 @@
+;;; ======================================================
+; Low math
+;
+; Adds some basic math to the scheme primitives.
+; 
+; Edit: 03-31-2020
+;;; ======================================================
+
 ;; ======================================================
-;;; Basic and common mathmatics procedures
+; Predicates
 ;; ======================================================
 
+(define (divides? a b)
+  (= (remainder b a) 0))
+
+(define (even? x) (divides? 2 x))
+
+(define (positive? x) (> x 0))
+
+(define (negative? x) (< x 0))
+
+
+;; ======================================================
+; Basic and common procedures
+;; ======================================================
 (define (square x) (* x x))
+
 (define (cube x) (* x x x))
 
-;; Takes the average of two numbers
 (define (average a b) (/ ( + a b) 2.0))
+
+(define (inc n) (+ n 1))
+
+(define (identity x) x)
 
 ;; Takes b to the n
 (define (expt b n)
@@ -16,24 +41,9 @@
 	  (else (iter (* a b) b (- n 1)))))
   (iter 1 b n))
 
-;; Square root
-(define (sqrt x)
-  (define (good-enough? guess)
-    (< (abs (- (square guess) x)) 0.001))
-  (define (iter guess x)
-    (if (good-enough? guess)
-	guess
-	(iter ((lambda (a b)
-		 (average a (/ b a)))
-	       guess x) x)))
-  (iter 1.0 x))
-
-(define (divides? a b)
-  (= (remainder b a) 0))
-
-(define (even? x) (divides? 2 x))
-
-;; Finds the greatest commod divisor of any two numbers
+;; ======================================================
+; Divisors
+;; ======================================================
 (define (gcd a b)
   (if (= b 0)
       a
@@ -52,7 +62,7 @@
   (iter n 2))
 
 ;; ======================================================
-;;; Testing for primality
+; Primality tests
 ;; ======================================================
 
 ;; Using smallest divisor method
@@ -107,7 +117,7 @@
       true
       (iter times)))
   
-(define (prime? n) (mr-prime? n 10)) ; Which prime is used?
+(define (prime? n) (mr-prime? n 10)) ; Prime predicate alias
 
 ;; Searching for prime numbers, prime numbers take longer to test
 (define (search-for-primes n count)

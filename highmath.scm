@@ -1,26 +1,28 @@
+;;; ======================================================
+; High math
+;
+; Builds some more sophisticated math procedures using
+; procedures from low math and general methods.
+;
+; Edit: 03-31-2020
+;;; ======================================================
+
+(load "general_methods.scm")  ; Resolve dependencies
+
 ;; ======================================================
-;;; Accumulation structures
+; Higher level mathematics procedures
 ;; ======================================================
 
-(define (inc n) (+ n 1))
-(define (identity x) x)
+;; Square root
+(define (sqrt x)
+  (fixed-point (lambda (y) (average y (/ x y)))
+	       1.0))
 
-;; Accumulation
-(define (filtered-accumulate predicate? combiner null-value term a next b)
-  (define (iter x result)
-    (cond ((> x b) result)
-	  ((predicate? x)
-	   (iter (next x) (combiner result (term x))))
-	  (else
-	   (iter (next x) result))))
-  (iter a null-value))
-
-(define (accumulate combiner null-value term a next b)
-  (filtered-accumulate (lambda (x) true) combiner null-value term a next b))
-
+;; Series sum
 (define (sum term a next b)
   (accumulate + 0.0 term a next b))
 
+;; Series product
 (define (product term a next b)
   (accumulate * 1.0 term a next b))
 
@@ -29,16 +31,8 @@
       1
       (product identity 1 inc n)))
 
-;; Sum of cubes
-(define (sum-cubes a b)
-  (sum cube a inc b))
-
-;; Sum of integers
-(define (sum-ints a b)
-  (sum identity a inc b))
-
 ;; ======================================================
-;;; Integrations
+; Integrations
 ;; ======================================================
 
 ;; Using the definition of the integral
@@ -70,5 +64,3 @@
 
 ;; Integral alias
 (define (integral f a b n) (simpson-integral f a b n))
-
-
