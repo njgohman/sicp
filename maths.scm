@@ -20,12 +20,12 @@
 (define (sqrt x)
   (define (good-enough? guess)
     (< (abs (- (square guess) x)) 0.001))
-  (define (next guess x)
-    (average guess (/ x guess)))
   (define (iter guess x)
     (if (good-enough? guess)
 	guess
-	(iter (next guess x) x)))
+	(iter ((lambda (a b)
+		 (average a (/ b a)))
+	       guess x) x)))
   (iter 1.0 x))
 
 (define (divides? a b)
@@ -72,23 +72,21 @@
 ;; Succesive fermat-tests determine the primality of a number
 (define (flt-prime? n times)
   (define (fermat-test)
-    (define (try-it a)
-      (= (expmod a n n) a))
-    (try-it (+ 1 (random (- n 1)))))
+    (let ((a (+ 1 (random (- n 1)))))
+      (= (expmod a n n) a)))
   (cond ((= times 0) true)
 	((fermat-test) (flt-prime? n (- times 1)))
 	(else false)))
-
+    
 ;; Using the Miller-Rabin (MR) test
 (define (mr-expmod base exp m)
-  (define (sqmod x) ; Performs test when squaring the modulo
-    (define (check mdsqr)
+  (define (sqmod x)
+    (let ((mdsqr (remainder (square x) m)))
       (if (and (= mdsqr 1)
 	       (not (= x 1))
 	       (not (= x (- m 1))))
-	  0  ; True condition indicates that the number cannot be prime
-	  mdsqr))
-    (check (remainder (square x) m)))
+	  0
+	  mdsqr)))
   (cond ((= exp 0) 1)
 	((even? exp)  ; The squaring step, here MR test is done
 	 (sqmod (mr-expmod base (/ exp 2) m)))
@@ -98,10 +96,9 @@
 
 ;; MR prime
 (define (mr-prime? n times)
-  (define (mr-test)  ; Passing this test increases confidence that n is prime
-    (define (try-it a)
-      (= (mr-expmod a (- n 1) n) 1))
-    (try-it (+ 1 (random (- n 1)))))
+  (define (mr-test)
+    (let ((a (+ 1 (random (- n 1)))))
+      (= (mr-expmod a (- n 1) n) 1)))
   (define (iter t)
     (cond ((= t 0) true)
 	  ((mr-test) (iter (- t 1)))
