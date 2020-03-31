@@ -3,6 +3,7 @@
 ;; ======================================================
 
 (define (square x) (* x x))
+(define (cube x) (* x x x))
 
 ;; Takes the average of two numbers
 (define (average a b) (/ ( + a b) 2.0))
