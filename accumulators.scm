@@ -3,8 +3,7 @@
 ;; ======================================================
 
 (define (inc n) (+ n 1))
-(define (identity x) x)e
-(define (truth? x) true)
+(define (identity x) x)
 
 ;; Accumulation
 (define (filtered-accumulate predicate? combiner null-value term a next b)
@@ -17,7 +16,7 @@
   (iter a null-value))
 
 (define (accumulate combiner null-value term a next b)
-  (filtered-accumulate truth? combiner null-value term a next b))
+  (filtered-accumulate (lambda (x) true) combiner null-value term a next b))
 
 (define (sum term a next b)
   (accumulate + 0.0 term a next b))
@@ -44,29 +43,30 @@
 
 ;; Using the definition of the integral
 (define (definite-integral f a b dx)
-  (define (add-dx a)
-    (+ a dx))
-  (* (sum f (+ a (/ dx 2)) add-dx b)
+  (* (sum f
+	  (+ a (/ dx 2))
+	  (lambda (x) (+ x dx))
+	  b)
      dx))
 
 ;; Using Simpson's Rule
 (define (simpson-integral f a b n)
-  (define (simpson-next x)
-    (+ x (/ (- b a) n)))
   (define (simpson-term x)
-    (define (k)
-      (/ (* n (- x a)) (- b a)))
-    (define (simpson-const k)
-      (cond ((or (= k 0) (= (- n k) 0)) 1)
-	    ((and (> (- n k) 2) (even? k))
-	     (+ (remainder k 2) 2))
-	    ((> (- n k) 2)
-	     (+ (remainder k 2) 3))
-	    ((= (- n k) 2) 2)
-	    (else 4)))
-    (* (simpson-const (k)) (f x)))
-  (* (/ (- b a) (* 3.0 n))
-     (sum simpson-term a simpson-next b)))
+    (let ((k (/ (* n (- x a)) (- b a)))
+	  (term (f x)))
+      (cond ((or (= k 0)
+		 (= ( - n k) 0))
+	     term)
+	    ((or (even? k)
+		 (= (- n k) 2))
+	     (* 2 term))
+	    (else (* 4 term)))))
+  (let ((h (/ (- b a) n)))
+    (* (/ h 3.0)
+       (sum simpson-term
+	    a
+	    (lambda (x) (+ x h))
+	    b))))
 
 ;; Integral alias
 (define (integral f a b n) (simpson-integral f a b n))
