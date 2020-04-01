@@ -27,7 +27,7 @@
 ;; ======================================================
 ; Some solvers
 ;; ======================================================
-(define tolerance 0.00001)
+(define tolerance 0.0000001)
 
 (define (close-enough? x y)
   (< (abs (- x y)) tolerance))
@@ -56,6 +56,20 @@
 ;; Finding fixed points (i.e. x where f(x) = x)
 (define (fixed-point f first-guess)
   (define (try guess)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+	  next
+	  (try next))))
+  (try first-guess))
+
+;; Average damping for fixed point searches
+(define (average-damp f)
+  (lambda (x) (average x (f x))))
+
+(define (fixed-point-report f first-guess)
+  (define (try guess)
+    (write guess)
+    (newline)
     (let ((next (f guess)))
       (if (close-enough? guess next)
 	  next
