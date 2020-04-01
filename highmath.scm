@@ -35,10 +35,10 @@
 ; Higher level mathematics procedures
 ;; ======================================================
 
-;; Square root
 (define (sqrt x)
-  (fixed-point (average-damp (lambda (y) (/ x y)))
-	       1.0))
+  (fixed-point-of-transform (lambda (y) (- x (square y)))
+			    newton-transform
+			    1.0))
 
 ;; Cube root
 (define (cube-root x)
@@ -54,14 +54,16 @@
 ; Estimations of some useful constants
 ;; ======================================================
 
-(define (pi) (half-interval-method sin 3.1 3.2))
+(define (pi)
+  (fixed-point-of-transform (lambda (x) (sin x))
+			    newton-transform
+			    3.0))
 
-;; Golden ratio
 (define (phi)
-  (fixed-point
-   (average-damp (lambda (x) (+ 1 (/ 1 x))))
-   1.0))
-		   
+  (fixed-point-of-transform (lambda (x) (+ 1 (/ 1 x)))
+			    average-damp
+			    1.0))
+
 ;; Base of the natural logarithm
 (define (e)
   (+ 2

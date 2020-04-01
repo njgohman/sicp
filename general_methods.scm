@@ -25,8 +25,22 @@
   (filtered-accumulate (lambda (x) true) combiner null-value term a next b))
 
 ;; ======================================================
+; Fixed-point transforms
+;; ======================================================
+
+;; Average damping for fixed point searches
+(define (average-damp f)
+  (lambda (x) (average x (f x))))
+
+;; Tranform used in Newton's method
+(define (newton-transform g)
+  (lambda (x)
+    (- x (/ (g x) ((deriv g) x)))))
+
+;; ======================================================
 ; Some solvers
 ;; ======================================================
+
 (define tolerance 0.0000001)
 
 (define (close-enough? x y)
@@ -62,10 +76,6 @@
 	  (try next))))
   (try first-guess))
 
-;; Average damping for fixed point searches
-(define (average-damp f)
-  (lambda (x) (average x (f x))))
-
 (define (fixed-point-report f first-guess)
   (define (try guess)
     (write guess)
@@ -75,3 +85,11 @@
 	  next
 	  (try next))))
   (try first-guess))
+
+;; Better fixed point, with configurable transform
+(define (fixed-point-of-transform g transform guess)
+  (fixed-point (transform g) guess))
+
+;; Newton's method
+(define (newtons-method g guess)
+  (fixed-point (newton-transform g) guess))
