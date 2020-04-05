@@ -4,14 +4,26 @@
 ; Builds some more sophisticated math procedures using
 ; procedures from low math and general methods.
 ;
-; Edit: 03-31-2020
+; Edit: 04-05-2020
 ;;; ======================================================
 
-(load "general_methods.scm")  ; Resolve dependencies
+(load "iterative_improve.scm")  ; Resolve dependencies
+(load "modifiers.scm")
 
 ;; ======================================================
-; Additional structures, general methods
+; Accumulation structures
 ;; ======================================================
+(define (filtered-accumulate predicate? combiner null-value term a next b)
+  (define (iter x result)
+    (cond ((> x b) result)
+	  ((predicate? x)
+	   (iter (next x) (combiner result (term x))))
+	  (else
+	   (iter (next x) result))))
+  (iter a null-value))
+
+(define (accumulate combiner null-value term a next b)
+  (filtered-accumulate (lambda (x) true) combiner null-value term a next b))
 
 ;; Series sum
 (define (sum term a next b)
@@ -21,28 +33,21 @@
 (define (product term a next b)
   (accumulate * 1.0 term a next b))
 
-;; Iterative
-(define (cont-frac n d k)
-  (define (iter i val)
-    (if (= i 0)
-	val
-	(iter (- i 1)
-	      (/ (n i) (+ (d i) val)))))
-  (iter (- k 1)
-	(/ (n k) (d k))))
-
 ;; ======================================================
 ; Higher level mathematics procedures
 ;; ======================================================
 
 (define (sqrt x)
-  (fixed-point-of-transform (lambda (y) (- x (square y)))
-			    newton-transform
-			    1.0))
+  (newtons-method (lambda (y) (- x (square y) 1.0))))
 
 ;; Cube root
 (define (cube-root x)
   (fixed-point (average-damp (lambda (y) (/ x (square y))))
+	       1.0))
+
+(define (n-root x n)
+  (fixed-point ((repeated average-damp (floor (nlog n 2)))
+		(lambda (y) (/ x (expt y (- n 1)))))
 	       1.0))
 
 (define (factorial n)
@@ -55,6 +60,9 @@
 ;; ======================================================
 
 (define (pi)
+  (newtons-method (lambda (x) (sin x)) 3.0))
+
+#;(define (pi)
   (fixed-point-of-transform (lambda (x) (sin x))
 			    newton-transform
 			    3.0))
