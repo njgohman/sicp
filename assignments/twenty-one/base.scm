@@ -7,13 +7,13 @@
                       (make-new-hand (deal))
                       (hand-up-card house-initial-hand))))
       (if (> (hand-total player-hand) 21)
-          (bust (hand-total player-hand) 0)                ; ``bust'': player loses
+          0                                                ; ``bust'': player loses
           (let ((house-hand 
                  (play-hand house-strategy
                             house-initial-hand
                             (hand-up-card player-hand))))
             (cond ((> (hand-total house-hand) 21)
-                   (bust (hand-total house-hand) 1))       ; ``bust'': house loses
+                   1)                                      ; ``bust'': house loses
                   ((> (hand-total player-hand)
                       (hand-total house-hand))
                    1)                      ; house loses
