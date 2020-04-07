@@ -46,6 +46,14 @@
 	  ((> up-card 6) true)
 	  (else false))))
 
+;; The both strategy of problem 6
+(define (both strategy-one strategy-two)
+  (lambda (hand up-card)
+    (if (and (strategy-one hand up-card)
+	     (strategy-two hand up-card))
+	true
+	false)))
+
 ;;; Tests
 
 (define (p4test player-strategy house-strategy)
