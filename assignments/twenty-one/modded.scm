@@ -2,13 +2,6 @@
 
 (load "base.scm")
 
-;; The simple stop strategy, problem 2
-(define (stop-at n)
-  (lambda (hand up-card)
-    (if (< (hand-total hand) n)
-	true
-	false)))
-
 ;; Testing multiple strategies, problem 3
 (define (test-strategy player-strategy house-strategy n)
   (define (iter wins i)
@@ -32,9 +25,32 @@
       (newline)
       decision)))
 
+;; The simple stop strategy, problem 2
+(define (stop-at n)
+  (lambda (hand up-card)
+    (if (< (hand-total hand) n)
+	true
+	false)))
+
+;; The Louis strategy, problem 5
+(define (louis hand up-card)
+  (let ((total (hand-total hand)))
+    (cond ((< total 12) true)
+	  ((> total 16) false)
+	  ((and (= total 12)
+		(< up-card 4))
+	   true)
+	  ((and (= total 16)
+		(= up-card 10))
+	   false)
+	  ((> up-card 6) true)
+	  (else false))))
+
+;;; Tests
+
 (define (p4test player-strategy house-strategy)
   (test-strategy (watch-player (stop-at 16))
 		 (watch-player (stop-at 15))
 		 2))
-	 
-    
+
+
