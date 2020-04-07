@@ -16,3 +16,25 @@
 	wins
 	(iter (+ wins (twenty-one player-strategy house-strategy)) (- i 1))))
   (iter 0 n))
+
+;; Watching strategy, problem 4
+(define (watch-player strategy)
+  (lambda (hand up-card)
+    (display "Opponent up card: ")
+    (write up-card)
+    (display " Hand total: ")
+    (write (hand-total hand))
+    (display " Decision: ")
+    (let ((decision (strategy hand up-card)))
+      (if decision
+	  (display "Hit")
+	  (display "Stand"))
+      (newline)
+      decision)))
+
+(define (p4test player-strategy house-strategy)
+  (test-strategy (watch-player (stop-at 16))
+		 (watch-player (stop-at 15))
+		 2))
+	 
+    
