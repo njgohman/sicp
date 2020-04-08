@@ -32,6 +32,8 @@
 
 (define (identity x) x)
 
+(define pi (* 4 (atan 1 1)))
+
 ;; Takes b to the n
 (define (expt b n)
   (define (iter a b n)

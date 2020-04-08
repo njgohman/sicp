@@ -59,15 +59,8 @@
 ; Estimations of some useful constants
 ;; ======================================================
 
-(define (pi)
-  (newtons-method (lambda (x) (sin x)) 3.0))
 
-#;(define (pi)
-  (fixed-point-of-transform (lambda (x) (sin x))
-			    newton-transform
-			    3.0))
-
-(define (phi)
+(define phi
   (fixed-point-of-transform (lambda (x) (+ 1 (/ 1 x)))
 			    average-damp
 			    1.0))
