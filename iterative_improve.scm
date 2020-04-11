@@ -18,12 +18,19 @@
 (define (cont-frac n d k)
   (define (iter i val)
     (if (= i 0)
-	val
+	(* 1.0 val)
 	(iter (- i 1)
 	      (/ (n i) (+ (d i) val)))))
   (iter (- k 1)
 	(/ (n k) (d k))))
 
+;; Nested expression
+(define (nested-acc op r term k)
+  (define (iter i val)
+    (if (= i 0)
+      (* 1.0 val)
+      (iter (- i 1) ((op i) (term i) val))))
+  (iter k r))
 
 ;; Iterative improvement
 (define (iterative-improve good-enough? improve)

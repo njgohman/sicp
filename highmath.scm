@@ -38,7 +38,7 @@
 ;; ======================================================
 
 (define (sqrt x)
-  (newtons-method (lambda (y) (- x (square y) 1.0))))
+  (newtons-method (lambda (y) (- x (square y))) 1.0))
 
 ;; Cube root
 (define (cube-root x)
@@ -60,13 +60,14 @@
 ;; ======================================================
 
 
+(define (rational k x)
+  (repeated-build (- k 1) 1 1 (+ 1 x)))
+
 (define phi
-  (fixed-point-of-transform (lambda (x) (+ 1 (/ 1 x)))
-			    average-damp
-			    1.0))
+  (/ 1 (repeated-build 20 1 1 1)))
 
 ;; Base of the natural logarithm
-(define (e)
+(define e
   (+ 2
      (cont-frac
       (lambda (i) 1.0)
@@ -87,6 +88,17 @@
      (if (= i 1) 1
 	 (- (* i 2) 1)))
    k))
+
+;; Estimate inverse tangent function
+(define (atan-cf k x)
+  (cont-frac
+    (lambda (i)
+      (if (= i 1) x
+	  (square (* (- i 1) x))))
+    (lambda (i)
+      (if (= i 1) 1
+	  (- (* i 2) 1)))
+    k))
 
 ;; ======================================================
 ; Integrations

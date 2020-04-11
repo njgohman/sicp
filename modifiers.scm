@@ -13,10 +13,15 @@
 (define (double f)
   (compose f f))
 
-(define (repeated f n)
-  (lambda (x)
-    (define (iter i composed)
-      (if (= i 0)
-	  composed
-	  (iter (- i 1) (f composed))))
-    (iter (- n 1) (f x))))
+(define (repeated p n)
+  (cond ((= n 0) (lambda (x) x))
+	((= n 1) p)
+	(else (lambda (x) (p ((repeated p (- n 1)) x))))))
+
+(define (build n d b)
+  (/ n (+ d b)))
+
+(define (repeated-build k n d b)
+  (* 1.0 ((repeated (lambda (x) (build n d x)) k) b)))
+
+
