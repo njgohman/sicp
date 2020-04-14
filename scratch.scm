@@ -1,0 +1,20 @@
+(load "common.scm")
+
+(define (pons x y)
+  (* (expt 2 x) (expt 3 y)))
+
+(define (par z)
+  (define (iter count val div)
+    (cond ((divides? div val)
+	   (iter (+ count 1) (/ val div) div))
+	  ((= div 6) (iter count val 2))
+	  (else count)))
+  (iter 0 z 6))
+
+(define (pdr z)
+  (define (iter count val div)
+    (cond ((divides? div val)
+	   (iter (+ count 1) (/ val div) div))
+	  ((= div 6) (iter count val 3))
+	  (else count)))
+  (iter 0 z 6))
