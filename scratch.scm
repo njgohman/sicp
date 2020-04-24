@@ -1,73 +1,17 @@
 (load "common.scm")
 
-(define (pons x y)
-  (* (expt 2 x) (expt 3 y)))
+(define (root-test x)
+  (flatmap
+    (lambda (rest-of-queens)
+      (map (lambda (new-row)
+	     (adjoin-position new-row 1 rest-of-queens))
+	   (enumerate-interval 1 3)))
+    x))
 
-(define (par z)
-  (define (iter count val div)
-    (cond ((divides? div val)
-	   (iter (+ count 1) (/ val div) div))
-	  ((= div 6) (iter count val 2))
-	  (else count)))
-  (iter 0 z 6))
-
-(define (pdr z)
-  (define (iter count val div)
-    (cond ((divides? div val)
-	   (iter (+ count 1) (/ val div) div))
-	  ((= div 6) (iter count val 3))
-	  (else count)))
-  (iter 0 z 6))
-
-(define (list-ref items n)
-  (if (= n 0)
-    (car items)
-    (list-ref (cdr items) (- n 1))))
-
-(define (length items)
-  (if (null? items)
-    0
-    (+ 1 (length (cdr items)))))  
-
-(define (append list1 list2)
-  (if (null? list1)
-    list2
-    (cons (car list1) (append (cdr list1) list2))))
-
-(define (last-pair listx)
-  (if (null? (cdr listx))
-    (car listx)
-    (last-pair (cdr listx))))
-
-(define nil '())
-
-(define (reverse listx)
-  (define (iter result residual)
-    (if (null? residual)
-      result
-      (iter (cons (car residual) result) (cdr residual))))
-  (iter nil listx))
-
-(define (same-parity x . y)
-  (define (iter same-parity? residual)
-    (cond ((null? residual) nil)
-	  ((same-parity? (car residual))
-	   (cons (car residual) (iter same-parity? (cdr residual))))
-	  (else
-	    (iter same-parity? (cdr residual)))))
-  (if (even? x)
-    (cons x (iter even? y))
-    (cons x (iter odd? y))))
-
-(define (scale-list items factor)
-  (map (lambda (x) (* x factor))
-       items))
-
-(define (square-list items)
-  (map (lambda (x) (square x))
-       items))
-
-(define (faux-for-each func items)
-  (if (null? items)
-    true
-    ()))
+(define (fold-test positions)
+  (let ((row (cadar positions)))
+    (fold-right
+      (lambda (a b)
+	(and b (not (= row (cadr a)))))
+      #t
+      (cdr positions))))
